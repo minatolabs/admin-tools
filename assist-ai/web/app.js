@@ -9,7 +9,7 @@ const SESSION_KEY = "assistai_current";
 // ---- Ollama health check ----
 async function checkHealth() {
   try {
-    const res = await fetch("/api/health");
+    const res = await fetch("api/health");
     const data = await res.json();
     const badge = document.getElementById("ollama-status");
     if (data.ollama === "connected") {
@@ -44,7 +44,7 @@ async function parseInput() {
   setParseLoading(true);
 
   try {
-    const res = await fetch("/api/parse", {
+    const res = await fetch("api/parse", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, hire_type_override: hireTypeOverride || null }),
