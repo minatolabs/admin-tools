@@ -1,0 +1,236 @@
+# ============================================
+# COMPANIES
+# ============================================
+companies:
+  TES:
+    name: "The Elder Statesman"
+    scope: "domestic"
+  D-FRAME:
+    name: "FRAME"
+    scope: "domestic"
+  I-FRAME:
+    name: "FRAME"
+    scope: "international"
+
+# ============================================
+# EMAIL SUBJECT PATTERNS (for RNH quick-parse)
+# ============================================
+email_patterns:
+  - pattern: "TES\\s*-\\s*RNH"
+    company: "TES"
+    hire_type: "RNH"
+  - pattern: "TES\\s*-\\s*CNH"
+    company: "TES"
+    hire_type: "CNH"
+  - pattern: "I\\s*-\\s*RNH"
+    company: "I-FRAME"
+    hire_type: "RNH"
+  - pattern: "D\\s*-\\s*RNH"
+    company: "D-FRAME"
+    hire_type: "RNH"
+  - pattern: "I\\s*-\\s*CNH"
+    company: "I-FRAME"
+    hire_type: "CNH"
+  - pattern: "D\\s*-\\s*CNH"
+    company: "D-FRAME"
+    hire_type: "CNH"
+
+# ============================================
+# RETAIL NEW HIRE (RNH) — Rules-based
+# ============================================
+hire_types:
+  RNH:
+    name: "Retail New Hire"
+    source: "hr_email"
+
+    base_tasks:
+      - name: "Create Email Account"
+        priority: 1
+        category: "Identity"
+      - name: "Create NewStore Account"
+        priority: 1
+        category: "Retail Systems"
+
+    roles:
+      Sales Associate:
+        level: "base"
+        additional_tasks: []
+
+      Key Holder:
+        level: "mid"
+        additional_tasks:
+          - name: "POS Elevated Permissions"
+            priority: 2
+            category: "Retail Systems"
+
+      AGM:
+        level: "high"
+        additional_tasks:
+          - name: "Order Laptop"
+            priority: 2
+            category: "Hardware"
+          - name: "Create Filecloud Account"
+            priority: 2
+            category: "Cloud Access"
+          - name: "Camera Access"
+            priority: 3
+            category: "Security"
+          - name: "POS Manager Permissions"
+            priority: 2
+            category: "Retail Systems"
+
+      GM:
+        level: "highest"
+        inherits: "AGM"
+        additional_tasks:
+          - name: "Full Admin POS Access"
+            priority: 1
+            category: "Retail Systems"
+          - name: "Store Alarm Codes"
+            priority: 2
+            category: "Security"
+          - name: "Vendor Portal Access"
+            priority: 3
+            category: "Business"
+
+  # ============================================
+  # CORPORATE NEW HIRE (CNH) — Form-driven
+  # ============================================
+  CNH:
+    name: "Corporate New Hire"
+    source: "spiceworks_form"
+
+    base_tasks:
+      - name: "Create Email Account"
+        priority: 1
+        category: "Identity"
+      - name: "Create AD Account"
+        priority: 1
+        category: "Identity"
+      - name: "Set Up VPN Access"
+        priority: 2
+        category: "Network"
+
+    form_field_mappings:
+
+      computer_requirements:
+        field_name: "Computer Requirements"
+        type: "select"
+        skip_values: ["does not apply", "n/a", ""]
+        task_template:
+          name: "Order {value} Laptop"
+          priority: 2
+          category: "Hardware"
+        note: "Does not apply to Retail unless GM/AGM"
+
+      filecloud_access:
+        field_name: "FileCloud (Shared Drive) Access"
+        type: "yes_no"
+        mirror_field: "For FileCloud (Shared Drive) access, enter current or former user to mirror access"
+        task_on_yes:
+          name: "Set Up FileCloud Access"
+          priority: 2
+          category: "Cloud Access"
+          subtask: "Mirror permissions from: {mirror_value}"
+
+      zoom_phone:
+        field_name: "Zoom Phone Extension"
+        type: "yes_no"
+        followup_field: "If yes for Zoom Phone Extension, direct number needed?"
+        task_on_yes:
+          name: "Set Up Zoom Phone Extension"
+          priority: 3
+          category: "Communication"
+          subtask_if_followup: "Provision direct number"
+
+      newstore_access:
+        field_name: "NewStore System Access?"
+        type: "yes_no"
+        level_field: "If yes, please select New Store access level"
+        task_on_yes:
+          name: "Create NewStore Account — {level_value}"
+          priority: 2
+          category: "Retail Systems"
+
+      full_circle:
+        field_name: "Full Circle Account"
+        type: "yes_no"
+        mirror_field: "For Full Circle access, enter current or former user to mirror access"
+        task_on_yes:
+          name: "Set Up Full Circle Account"
+          priority: 2
+          category: "Business Systems"
+          subtask: "Mirror permissions from: {mirror_value}"
+
+      bluecherry_erp:
+        field_name: "BlueCherry ERP"
+        type: "yes_no"
+        mirror_field: "For BlueCherry (ERP) access, enter current or former user to mirror access"
+        task_on_yes:
+          name: "Set Up BlueCherry ERP Access"
+          priority: 2
+          category: "Business Systems"
+          subtask: "Mirror permissions from: {mirror_value}"
+
+      bluecherry_plm:
+        field_name: "BlueCherry PLM"
+        type: "yes_no"
+        mirror_field: "For BlueCherry (PLM) access, enter current or former user to mirror access"
+        task_on_yes:
+          name: "Set Up BlueCherry PLM Access"
+          priority: 2
+          category: "Business Systems"
+          subtask: "Mirror permissions from: {mirror_value}"
+
+      additional_equipment:
+        field_name: "Additional Equipment for Office/WFH"
+        type: "text"
+        skip_values: ["-", "", "n/a", "no"]
+        task_on_value:
+          name: "Order Additional Equipment"
+          priority: 3
+          category: "Hardware"
+          details: "{value}"
+
+      other_access:
+        field_name: "Other system access not listed needed"
+        type: "text"
+        skip_values: ["-", "", "n/a", "no"]
+        task_on_value:
+          name: "Set Up Additional Access"
+          priority: 3
+          category: "Other"
+          details: "{value}"
+
+      distro_lists:
+        field_name: "Distro Lists other than office/retail location"
+        type: "text"
+        skip_values: ["-", "", "n/a", "no"]
+        task_on_value:
+          name: "Add to Distribution Lists"
+          priority: 3
+          category: "Email"
+          details: "{value}"
+
+      other_requests:
+        field_name: "For any other IT Onboarding requests or requirements not listed"
+        type: "text"
+        skip_values: ["-", "", "n/a", "no"]
+        task_on_value:
+          name: "Handle Additional IT Request"
+          priority: 3
+          category: "Other"
+          details: "{value}"
+
+# ============================================
+# INTERNATIONAL MODIFIERS
+# ============================================
+scope_modifiers:
+  international:
+    additional_tasks:
+      - name: "Verify International Email Domain"
+        priority: 1
+        category: "Identity"
+      - name: "Set Timezone / Regional Settings"
+        priority: 2
+        category: "Configuration"
