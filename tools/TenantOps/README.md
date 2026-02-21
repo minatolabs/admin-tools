@@ -1,32 +1,140 @@
-# Tenant Operations
+# TenantOps (Windows)
 
-## Quick Run Commands
+Hybrid admin scripts for when you want results, not 47 browser tabs.
 
-To run scripts, use the following command structure in PowerShell:
+Built for **domain-joined Windows laptops** in a **hybrid Entra + AD + M365** environment.
+
+---
+
+## ⚡ Quick Commands
+
+| What you want | Command |
+|---|---|
+| Run (from this folder) | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\M365-Hybrid-Admin-Tool.ps1"` |
+| Run (full path) | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Users\<YOUR_USERNAME>\admin-tools\tools\TenantOps\M365-Hybrid-Admin-Tool.ps1"` |
+| Run (no username editing) | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\admin-tools\tools\TenantOps\M365-Hybrid-Admin-Tool.ps1"` |
+| Install EXO module | `Install-Module ExchangeOnlineManagement -Scope CurrentUser` |
+| Install AD tools (RSAT) | `Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0` |
+
+---
+
+## ✅ Known Good Environment
+
+- **Windows**: 10/11 (domain-joined)
+- **PowerShell**: Windows PowerShell 5.1 or PowerShell 7 (Windows)
+- **Network**: corporate LAN (same subnets) / VPN not required in this setup
+
+---
+
+## What this script does today (no surprises)
+
+Right now, `M365-Hybrid-Admin-Tool.ps1` is a **scaffold**:
+
+- Connects to **Exchange Online** (`Connect-ExchangeOnline`)
+- Placeholder for admin logic
+- Disconnects cleanly (`Disconnect-ExchangeOnline`)
+
+More AD/Entra actions can be added as the toolkit grows.
+
+---
+
+## What’s in here
+
+<table>
+  <tr>
+    <td width="60%" valign="top">
+      <h3>M365 Hybrid Admin Tool</h3>
+      <p><code>M365-Hybrid-Admin-Tool.ps1</code></p>
+      <ul>
+        <li>Connects to <strong>Exchange Online</strong></li>
+        <li>Acts as a clean scaffold for hybrid workflows</li>
+        <li>Disconnects automatically at the end</li>
+      </ul>
+    </td>
+    <td width="40%" valign="top">
+      <h3>TL;DR</h3>
+      <ul>
+        <li><strong>Windows only</strong></li>
+        <li><strong>Run on your laptop</strong> (not a DC)</li>
+        <li><strong>No secrets</strong> in code, ever</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+---
+
+## First-time setup (newbie mode)
+
+### Step 1 — Get the code
+
+**Option A: Git (recommended)**
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Path\To\Your\Script.ps1"
+cd $env:USERPROFILE
+git clone https://github.com/minatolabs/admin-tools.git
+cd .\admin-tools\tools\TenantOps\
 ```
 
-## First-Time Setup Steps
-1. Install the required modules:
-   - Run: `Install-Module -Name ExchangeOnlineManagement`
-   - If you need RSAT for Active Directory, install it via Windows Features.
-2. Authenticate to Microsoft Exchange:
-   - Use `Connect-ExchangeOnline -UserPrincipalName your_username@domain.com`
+**Option B: Download ZIP (no Git)**
+1. Repo → **Code** → **Download ZIP**
+2. Extract it
+3. Open PowerShell and go to:
+```powershell
+cd "...\admin-tools-main\tools\TenantOps\"
+```
 
-## Prerequisites
-- **ExchangeOnlineManagement**: Ensure that you have this module installed. Use the command mentioned in setup steps.
-- **Optional**: RSAT Active Directory can be installed for managing AD features.
+### Step 2 — Install the Exchange Online module (required)
+```powershell
+Install-Module ExchangeOnlineManagement -Scope CurrentUser
+```
 
-## Common Fixes
-1. **Connection Issues**: Ensure your credentials are correct and that you have the necessary permissions.
-2. **Execution Policy**: If you encounter execution policy errors, run the command: `Set-ExecutionPolicy RemoteSigned`.
+Quick check:
+```powershell
+Get-Module ExchangeOnlineManagement -ListAvailable
+```
 
-## Safety Rules
-- Always backup your data before performing bulk operations.
-- Test scripts in a non-production environment before deployment.
+### Step 3 — Optional: install AD tools (only needed once you add AD commands)
+If you later add AD actions like `Get-ADUser`, install RSAT:
 
-## Roadmap
-- 2026 Q2: Implement new features for user management.
-- 2026 Q3: Enhance documentation and add more examples.
-- 2026 Q4: Review feedback and improve the toolkit based on user experience.
+```powershell
+# Run PowerShell as Administrator for this
+Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
+```
+
+Check:
+```powershell
+Get-Module ActiveDirectory -ListAvailable
+```
+
+---
+
+## Common “why is it yelling at me” fixes
+
+### `Connect-ExchangeOnline` not recognized
+```powershell
+Install-Module ExchangeOnlineManagement -Scope CurrentUser
+```
+
+### `Get-ADUser` not recognized
+```powershell
+Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
+```
+
+### PowerShell profile weirdness / slow startup / random aliases
+Run with `-NoProfile` (we already do).
+
+---
+
+## Safety rules (non‑negotiable)
+
+- **No secrets** in code (no passwords, tokens, tenant keys).
+- Prefer **read/validate** before **write**.
+- If anything destructive is added later: require explicit confirmation and document it.
+
+---
+
+## Roadmap (a.k.a. “coming soon™”)
+
+- [ ] Add real hybrid actions (AD + EXO) with a menu
+- [ ] Standardize output/logging
+- [ ] Add `Get-Help` examples and operator notes
