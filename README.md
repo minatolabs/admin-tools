@@ -1,105 +1,81 @@
-# 🛠️ Admin Tools
+# Admin Tools
 
-**Internal IT administration toolkit** — a collection of automation tools, AI assistants, and utilities built by the IT team, for the IT team.
-
----
-
-## 📁 Tools
-
-| Tool | Directory | Status | Description |
-|------|-----------|--------|-------------|
-| **AssistAI** | [`/assist-ai`](./assist-ai/) | 🚧 In Development | AI-powered onboarding assistant — parses HR emails & Spiceworks tickets, generates task checklists |
-| *More coming...* | | | |
+Internal IT administration toolkit — lightweight tools, assistants, and utilities that help the IT team move faster and stay consistent.
 
 ---
 
-## 🏗️ Architecture
+## Tools
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>AssistAI</h3>
+      <p><strong>AI-powered onboarding assistant</strong> that parses HR emails and Spiceworks tickets and generates a structured IT checklist. Stateless by design (no server-side storage).</p>
+      <p><a href="./assist-ai/"><strong>Open tool →</strong></a></p>
+      <ul>
+        <li>Ollama + LLM parsing</li>
+        <li>Rules-driven checklists (<code>onboarding_rules.yml</code>)</li>
+        <li>Ephemeral session tracking (browser-only)</li>
+      </ul>
+      <p><em>Status:</em> 🚧 In development</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>TenantOps</h3>
+      <p><strong>Tenant administration utilities</strong> (PowerShell) for day-to-day M365 / hybrid operations.</p>
+      <p><a href="./tools/TenantOps/"><strong>Open tool →</strong></a></p>
+      <ul>
+        <li>Operator-friendly scripts</li>
+        <li>Repeatable admin workflows</li>
+        <li>Designed for tech handoff</li>
+      </ul>
+      <p><em>Status:</em> ✅ Active</p>
+    </td>
+  </tr>
+</table>
+
+---
+
+## Repository Layout
 
 ```
 admin-tools/
-├── assist-ai/          # AI onboarding assistant (Ollama + FastAPI)
-├── <future-tool>/      # Placeholder for next tool
-├── <future-tool>/      # Placeholder for next tool
-└── README.md           # You are here
+├── assist-ai/              # AI onboarding assistant
+└── tools/
+    └── TenantOps/          # Tenant admin utilities (PowerShell)
 ```
 
-Each tool lives in its own directory with its own `README.md`, `Dockerfile`, and deployment instructions. Tools are **independent** — you can deploy one without the others.
+---
+
+## Standards (Important)
+
+- **No secrets:** never commit passwords, tokens, key files, or credential exports.
+- **No PII storage:** tools should avoid persisting employee data unless explicitly approved.
+- **Documentation-first:** each tool includes its own `README.md` with install + usage.
 
 ---
 
-## 🖥️ Infrastructure
+## Quick Start
 
-| Resource | Detail |
-|----------|--------|
-| **Server OS** | Ubuntu 22.04 LTS |
-| **GPU** | NVIDIA T1000 8GB |
-| **Deployment** | Docker / Docker Compose |
-| **Access** | Internal network only |
+Each tool is self-contained. Go to the tool directory and follow its README:
+
+- AssistAI: [`./assist-ai/README.md`](./assist-ai/README.md)
+- TenantOps: browse scripts in [`./tools/TenantOps/`](./tools/TenantOps/)
 
 ---
 
-## 🚀 Getting Started
+## Roadmap
 
-### Prerequisites
-- Docker & Docker Compose installed
-- NVIDIA Container Toolkit (for GPU-accelerated tools)
-- Git access to this repository
+- **AssistAI**
+  - [ ] Multi-company refinements (TES / FRAME Domestic / FRAME International)
+  - [ ] SOP Finder (guided “how-to” + document pointers)
+  - [ ] Optional auth if/when we add access to sensitive internal resources
 
-### Deploy a Tool
-```bash
-# Clone the repo
-git clone git@github.com:minatolabs/admin-tools.git
-cd admin-tools
-
-# Navigate to the tool you want
-cd assist-ai
-
-# Launch it
-docker compose up -d
-```
-
-Each tool has its own setup instructions in its directory. Check the tool's `README.md` for specifics.
+- **TenantOps**
+  - [ ] Standardize output/logging format
+  - [ ] Add parameter validation + usage examples
 
 ---
 
-## 📋 Tool Index & Roadmap
+## Internal Use
 
-### ✅ Phase 1 — AssistAI (Onboarding Assistant)
-- [x] Parse HR onboarding emails (RNH/CNH)
-- [x] Parse Spiceworks onboarding tickets
-- [x] Auto-generate task checklists by company, role, and department
-- [x] Ephemeral web UI — no data stored
-- [ ] Multi-company support (TES, FRAME Domestic, FRAME International)
-
-### 🔮 Phase 2 — SOP Finder *(Planned)*
-- [ ] AI-assisted SOP search ("How do I set up VPN for a new user?")
-- [ ] Points techs to the correct document on the file server
-- [ ] Summarizes key steps from SOPs
-
-### 🔮 Phase 3 — Credential Reference *(Planned)*
-- [ ] Secure pointer to credential storage (KeePass, vault)
-- [ ] "Where is the admin login for X?" → returns file location, not passwords
-- [ ] Basic authentication layer for access control
-
----
-
-## 👥 Team
-
-| Role | Responsibility |
-|------|---------------|
-| **IT Admin** | Maintains tools, updates rules/configs |
-| **IT Techs** | End users — use tools for daily tasks |
-
----
-
-## ⚠️ Important
-
-- **This is a private repository.** Do not share access outside the IT team.
-- **No sensitive data** (passwords, PII) should be committed to this repo.
-- **Employee data is never stored** — tools are designed to be ephemeral and stateless.
-
----
-
-## 📄 License
-
-Internal use only. Not licensed for distribution.
+This repository is intended for internal IT operations. External distribution is not planned.
