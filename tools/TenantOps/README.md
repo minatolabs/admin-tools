@@ -1,49 +1,27 @@
-# Tenant Operations
+# Hybrid AD/Entra Guidance
 
-## Path
-To navigate to this directory, run:
+This section provides guidance for running scripts in a hybrid environment with Active Directory and Microsoft Entra.
 
-```bash
-cd admin-tools/tools/TenantOps
-```
+## Running Scripts on Domain-Joined Laptops
 
-## Prerequisites
-Make sure you have the following module installed:
+The scripts can be executed on domain-joined laptops. Ensure that you have the necessary permissions to run these scripts.
 
-- **ExchangeOnlineManagement** 
-To connect to Exchange, use the following command:
+## RSAT Active Directory Module Installation Steps
 
-```powershell
-Connect-ExchangeOnline
-```
+To install the RSAT Active Directory module:  
+1. Open PowerShell as an administrator.  
+2. Run the following command:  
+   ```powershell  
+   Add-WindowsCapability -Name RSAT.ActiveDirectory.DS-LDS.Tools~~~0.0.1.0 -Online  
+   ```
+3. Wait for the installation to complete.
 
-## Newbie-Friendly Windows Instructions
-1. **Installing Git**
-   - Download the Git installer from [git-scm.com](https://git-scm.com/downloads) and run it. Follow the installation prompts.
-   
-2. **Installing PowerShell**
-   - If you're using Windows 10 or later, PowerShell comes pre-installed. If not, download PowerShell from the [PowerShell GitHub repository](https://github.com/PowerShell/PowerShell/releases).
-   
-3. **Setting Execution Policy**  
-   - Open PowerShell as an administrator.
-   - Run the following command to allow script execution:
-   ```powershell
-   Set-ExecutionPolicy RemoteSigned
-   ```  
-   - Confirm your choice if prompted.
-  
-4. **Installing the ExchangeOnlineManagement Module**
-   - Run the following command in PowerShell:
-   ```powershell
-   Install-Module -Name ExchangeOnlineManagement -Force
-   ```  
+## Running the Command
 
-5. **Running the Script**  
-   - After completing the previous steps, you can run the script as follows:
-   ```powershell
-   .\YourScriptName.ps1 -TenantId 'your-tenant-id'
-   ```  
-   - Replace `YourScriptName.ps1` with the actual name of your script and provide the appropriate Tenant ID.
-  
-   
-Feel free to reach out if you encounter any issues!
+To run the command, use the following:  
+```powershell  
+Set-ExecutionPolicy -ExecutionPolicy CurrentUser  
+.\M365-Hybrid-Admin-Tool.ps1  
+``` 
+
+Ensure that the execution policy is set to allow scripts to run as the current user, and replace the path to the script if necessary.
