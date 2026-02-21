@@ -1,27 +1,40 @@
-# Hybrid AD/Entra Guidance
+# TenantOps (Windows)
 
-This section provides guidance for running scripts in a hybrid environment with Active Directory and Microsoft Entra.
+**TenantOps** is a collection of PowerShell scripts designed to streamline administrative tasks within Microsoft 365 environments, particularly focusing on hybrid configurations involving both on-premises and cloud services. This guide will walk you through the prerequisites, installation steps, and provide examples of how to run the scripts properly.
 
-## Running Scripts on Domain-Joined Laptops
+## Prerequisites
 
-The scripts can be executed on domain-joined laptops. Ensure that you have the necessary permissions to run these scripts.
+Before using TenantOps, ensure you have the following installed:
 
-## RSAT Active Directory Module Installation Steps
+- **RSAT Active Directory Tools**: These are needed for managing your Active Directory from a remote machine.
+- **Exchange Online Management Module**: This module is necessary for managing Exchange Online environments.
 
-To install the RSAT Active Directory module:  
-1. Open PowerShell as an administrator.  
-2. Run the following command:  
-   ```powershell  
-   Add-WindowsCapability -Name RSAT.ActiveDirectory.DS-LDS.Tools~~~0.0.1.0 -Online  
+## Installation Steps
+
+1. **Clone the Repository**: Start by cloning the repository to your local machine.
+   ```bash
+   git clone https://github.com/minatolabs/admin-tools.git
    ```
-3. Wait for the installation to complete.
 
-## Running the Command
+2. **Navigate to the Directory**: Change to the TenantOps directory.
+   ```bash
+   cd admin-tools/tools/TenantOps
+   ```
 
-To run the command, use the following:  
-```powershell  
-Set-ExecutionPolicy -ExecutionPolicy CurrentUser  
-.\M365-Hybrid-Admin-Tool.ps1  
-``` 
+3. **Run the Scripts**: You can execute the PowerShell scripts using the following command for unsigned scripts:
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File "M365-Hybrid-Admin-Tool.ps1"
+   ```
 
-Ensure that the execution policy is set to allow scripts to run as the current user, and replace the path to the script if necessary.
+## Invocation Example
+
+To run the main script, ensure you are in the correct directory and run the following command:
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "M365-Hybrid-Admin-Tool.ps1"
+```
+
+This will execute the primary script of the TenantOps suite, allowing you to perform administrative tasks with ease.
+
+## Conclusion
+
+With TenantOps, you can effectively manage your hybrid environment by following the steps outlined in this document. Ensure that you meet all prerequisites and carefully follow the execution commands for a smooth experience.
