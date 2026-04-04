@@ -4,6 +4,53 @@ AssistAI is a lightweight, self-hosted AI assistant that parses HR onboarding em
 
 ---
 
+## 🔐 Security Design Decisions
+
+AssistAI handles sensitive HR and employee data during onboarding. Every architectural choice was made with data minimization and least-privilege as first-order constraints — not afterthoughts.
+
+### Zero Server-Side Persistence
+
+**Decision:** The FastAPI backend processes each request in-memory and immediately discards all parsed data. There is no database, no log sink, no session store.
+
+**Why:** Onboarding emails and tickets contain PII (names, start dates, roles, managers, locations). Storing this data server-side — even temporarily — creates a data-at-rest liability and expands the blast radius of any compromise. With zero persistence, there is nothing to exfiltrate.
+
+### sessionStorage-Only Client State
+
+**Decision:** Checklist state is held exclusively in browser `sessionStorage`. It is destroyed automatically when the tab closes.
+
+**Why:** `sessionStorage` is scoped to a single tab and is never sent to the server, never written to disk, and never accessible cross-origin. Compared to `localStorage` or cookies, it provides the shortest possible data lifetime. A technician closing a tab after completing setup leaves no residual employee data on the workstation — important in shared-desk or open-office environments.
+
+### No PII Logging
+
+**Decision:** The application explicitly avoids logging parsed employee fields (names, emails, roles). Log output is limited to request metadata and error conditions.
+
+**Why:** Application logs are often shipped to centralized log aggregators, retained for months, and accessible to a broader set of operators than the application itself. Logging PII widens the data access surface significantly. Keeping logs free of employee data keeps that surface narrow.
+
+### Internal Network Constraint
+
+**Decision:** AssistAI is designed to run on an internal network only. The Docker configuration binds to the host interface without TLS termination, making accidental public exposure obvious rather than silent.
+
+**Why:** The tool runs a local LLM (Ollama) and processes onboarding data — neither should be reachable from the internet. Requiring a deliberate infrastructure change (reverse proxy + TLS + firewall rule) to expose the service externally enforces a security gate by default. This reflects a zero-trust posture: internal tools stay internal unless explicitly promoted.
+
+### LLM Isolation
+
+**Decision:** The LLM (llama3.1:8b via Ollama) runs locally on-prem hardware. No data is sent to external AI APIs.
+
+**Why:** Sending HR onboarding data to cloud AI providers (OpenAI, Anthropic, etc.) would require data processing agreements, expose PII to third-party retention policies, and create audit trail gaps. Running the model locally keeps all inference within the trust boundary.
+
+### Threat Model Summary
+
+| Threat | Mitigated By |
+|--------|-------------|
+| PII exposure via server breach | Zero server-side persistence |
+| Data leakage via browser storage | sessionStorage (tab-scoped, ephemeral) |
+| Log aggregator PII exposure | No employee data in logs |
+| Accidental public exposure | Internal-only network binding |
+| Third-party AI data retention | Local LLM (Ollama, on-prem) |
+| Overprivileged data access | No auth required internally; no data stored to protect |
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -297,6 +344,8 @@ Organization: FRAME
 ---
 
 ## ⚠️ Privacy & Security
+
+See the [Security Design Decisions](#-security-design-decisions) section at the top of this document for the full rationale behind these choices.
 
 - **Zero server-side persistence** — the API processes and discards data immediately
 - **No logging of employee data** — keep it that way
