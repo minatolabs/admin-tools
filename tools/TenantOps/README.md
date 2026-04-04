@@ -1,140 +1,66 @@
-# TenantOps (Windows)
+# Tenant-Ops — M365 Hybrid Admin Tool
 
-Hybrid admin scripts for when you want results, not 47 browser tabs.
+A PowerShell 7 admin toolkit for managing Microsoft 365 hybrid environments (Active Directory + Exchange Online + Azure AD Connect).
 
-Built for **domain-joined Windows laptops** in a **hybrid Entra + AD + M365** environment.
+## Features
 
----
+- **User Onboarding** — Create AD users (AD-first hybrid model), set passwords, assign AD groups, trigger AAD Connect delta sync
+- **User Offboarding** — Disable AD accounts, move to disabled OU, trigger sync
+- **Mailbox Permissions** — Grant or remove FullAccess, SendAs, and SendOnBehalf; supports bulk operations (one mailbox → many delegates, or many mailboxes → one delegate)
+- **Cloud Connectivity** — Connect/disconnect Exchange Online and Microsoft Graph in one step
+- **Compliance & Audit Logging** — Every action is written to a JSONL audit log and full transcript (stored in `%ProgramData%\M365HybridAdminTool\Logs`)
+- **Diagnostics** — Prerequisites checker for RSAT, ExchangeOnlineManagement, Microsoft.Graph, and ADSync modules
 
-## ⚡ Quick Commands
+## Requirements
 
-| What you want | Command |
+| Requirement | Notes |
 |---|---|
-| Run (from this folder) | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\M365-Hybrid-Admin-Tool.ps1"` |
-| Run (full path) | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Users\<YOUR_USERNAME>\admin-tools\tools\TenantOps\M365-Hybrid-Admin-Tool.ps1"` |
-| Run (no username editing) | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\admin-tools\tools\TenantOps\M365-Hybrid-Admin-Tool.ps1"` |
-| Install EXO module | `Install-Module ExchangeOnlineManagement -Scope CurrentUser` |
-| Install AD tools (RSAT) | `Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0` |
+| PowerShell 7+ | [Download](https://github.com/PowerShell/PowerShell/releases) |
+| RSAT: Active Directory DS Tools | Required for AD operations |
+| ExchangeOnlineManagement module | Auto-installed if missing |
+| Microsoft.Graph module | Optional, auto-installed if connecting to Graph |
+| ADSync module | Only needed on the AAD Connect server |
 
----
-
-## ✅ Known Good Environment
-
-- **Windows**: 10/11 (domain-joined)
-- **PowerShell**: Windows PowerShell 5.1 or PowerShell 7 (Windows)
-- **Network**: corporate LAN (same subnets) / VPN not required in this setup
-
----
-
-## What this script does today (no surprises)
-
-Right now, `M365-Hybrid-Admin-Tool.ps1` is a **scaffold**:
-
-- Connects to **Exchange Online** (`Connect-ExchangeOnline`)
-- Placeholder for admin logic
-- Disconnects cleanly (`Disconnect-ExchangeOnline`)
-
-More AD/Entra actions can be added as the toolkit grows.
-
----
-
-## What’s in here
-
-<table>
-  <tr>
-    <td width="60%" valign="top">
-      <h3>M365 Hybrid Admin Tool</h3>
-      <p><code>M365-Hybrid-Admin-Tool.ps1</code></p>
-      <ul>
-        <li>Connects to <strong>Exchange Online</strong></li>
-        <li>Acts as a clean scaffold for hybrid workflows</li>
-        <li>Disconnects automatically at the end</li>
-      </ul>
-    </td>
-    <td width="40%" valign="top">
-      <h3>TL;DR</h3>
-      <ul>
-        <li><strong>Windows only</strong></li>
-        <li><strong>Run on your laptop</strong> (not a DC)</li>
-        <li><strong>No secrets</strong> in code, ever</li>
-      </ul>
-    </td>
-  </tr>
-</table>
-
----
-
-## First-time setup (newbie mode)
-
-### Step 1 — Get the code
-
-**Option A: Git (recommended)**
-```powershell
-cd $env:USERPROFILE
-git clone https://github.com/minatolabs/admin-tools.git
-cd .\admin-tools\tools\TenantOps\
-```
-
-**Option B: Download ZIP (no Git)**
-1. Repo → **Code** → **Download ZIP**
-2. Extract it
-3. Open PowerShell and go to:
-```powershell
-cd "...\admin-tools-main\tools\TenantOps\"
-```
-
-### Step 2 — Install the Exchange Online module (required)
-```powershell
-Install-Module ExchangeOnlineManagement -Scope CurrentUser
-```
-
-Quick check:
-```powershell
-Get-Module ExchangeOnlineManagement -ListAvailable
-```
-
-### Step 3 — Optional: install AD tools (only needed once you add AD commands)
-If you later add AD actions like `Get-ADUser`, install RSAT:
+## Usage
 
 ```powershell
-# Run PowerShell as Administrator for this
-Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
+# Run (bypass execution policy for testing)
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File .\M365-Hybrid-Admin-Tool.ps1
+
+# Show version
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File .\M365-Hybrid-Admin-Tool.ps1 -ShowVersion
 ```
 
-Check:
-```powershell
-Get-Module ActiveDirectory -ListAvailable
+## Audit Logs
+
+All actions are logged to:
+```
+%ProgramData%\M365HybridAdminTool\Logs\
+  Audit-YYYY-MM-DD.jsonl       ← structured JSON audit trail
+  Transcript-YYYY-MM-DD_*.txt  ← full console transcript
 ```
 
----
+Each audit event includes: UTC timestamp, correlation ID, operator (domain\user), computer name, action, result (Success / Failure / Info), and contextual data.
 
-## Common “why is it yelling at me” fixes
+## Menu Structure
 
-### `Connect-ExchangeOnline` not recognized
-```powershell
-Install-Module ExchangeOnlineManagement -Scope CurrentUser
+```
+Main Menu
+├── 1) Connect to Exchange Online / Graph
+├── 2) Onboard user (AD-first)
+├── 3) Offboard user (AD-first)
+├── 4) Mailbox permissions
+│   ├── Grant: FullAccess / SendAs / SendOnBehalf
+│   └── Remove: FullAccess / SendAs / SendOnBehalf / ALL
+├── 5) Diagnostics / prerequisites
+├── 6) Disconnect cloud sessions
+└── 7) Exit
 ```
 
-### `Get-ADUser` not recognized
-```powershell
-Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
-```
+## Version
 
-### PowerShell profile weirdness / slow startup / random aliases
-Run with `-NoProfile` (we already do).
+`v0.3.3-test` — Build date: 2026-02-20
 
----
+## License
 
-## Safety rules (non‑negotiable)
-
-- **No secrets** in code (no passwords, tokens, tenant keys).
-- Prefer **read/validate** before **write**.
-- If anything destructive is added later: require explicit confirmation and document it.
-
----
-
-## Roadmap (a.k.a. “coming soon™”)
-
-- [ ] Add real hybrid actions (AD + EXO) with a menu
-- [ ] Standardize output/logging
-- [ ] Add `Get-Help` examples and operator notes
+MIT
