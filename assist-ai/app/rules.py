@@ -18,7 +18,7 @@ def _resolve_company(company_raw: str | None, scope: str = "domestic") -> str | 
     normalized = (company_raw or "").strip()
     if normalized in COMPANIES:
         return normalized
-    # When multiple company codes share the same name (e.g. D-FRAME / I-FRAME),
+    # When multiple company codes share the same name (e.g. D-AURA / I-AURA),
     # prefer the one whose scope matches the parsed scope.
     matches = []
     for code, info in COMPANIES.items():

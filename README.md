@@ -66,7 +66,7 @@ Each tool is self-contained. Go to the tool directory and follow its README:
 ## Roadmap
 
 - **AssistAI**
-  - [ ] Multi-company refinements (TES / FRAME Domestic / FRAME International)
+  - [ ] Multi-company refinements (NVS / AURA Domestic / AURA International)
   - [ ] SOP Finder (guided “how-to” + document pointers)
   - [ ] Optional auth if/when we add access to sensitive internal resources
 

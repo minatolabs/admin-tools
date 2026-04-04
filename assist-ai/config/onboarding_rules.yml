@@ -2,37 +2,37 @@
 # COMPANIES
 # ============================================
 companies:
-  TES:
-    name: "The Elder Statesman"
+  NVS:
+    name: "Nova Style Co."
     scope: "domestic"
-  D-FRAME:
-    name: "FRAME"
+  D-AURA:
+    name: "Aura"
     scope: "domestic"
-  I-FRAME:
-    name: "FRAME"
+  I-AURA:
+    name: "Aura"
     scope: "international"
 
 # ============================================
 # EMAIL SUBJECT PATTERNS (for RNH quick-parse)
 # ============================================
 email_patterns:
-  - pattern: "TES\\s*-\\s*RNH"
-    company: "TES"
+  - pattern: "NVS\\s*-\\s*RNH"
+    company: "NVS"
     hire_type: "RNH"
-  - pattern: "TES\\s*-\\s*CNH"
-    company: "TES"
+  - pattern: "NVS\\s*-\\s*CNH"
+    company: "NVS"
     hire_type: "CNH"
   - pattern: "I\\s*-\\s*RNH"
-    company: "I-FRAME"
+    company: "I-AURA"
     hire_type: "RNH"
   - pattern: "D\\s*-\\s*RNH"
-    company: "D-FRAME"
+    company: "D-AURA"
     hire_type: "RNH"
   - pattern: "I\\s*-\\s*CNH"
-    company: "I-FRAME"
+    company: "I-AURA"
     hire_type: "CNH"
   - pattern: "D\\s*-\\s*CNH"
-    company: "D-FRAME"
+    company: "D-AURA"
     hire_type: "CNH"
 
 # ============================================

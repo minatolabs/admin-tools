@@ -128,7 +128,7 @@ The app will pull `llama3.1:8b` automatically on first startup via the Ollama co
 
 The AI will extract:
 - Employee name, start date, position, manager, location
-- Company (TES, FRAME)
+- Company (NVS, AURA)
 - Role (GM, AGM, Key Holder, Sales Associate) to determine tasks
 
 ### Corporate New Hire (CNH)
@@ -252,7 +252,7 @@ ports:
 
 **Input email:**
 ```
-Sub : TES - RNH John Smith
+Sub : NVS - RNH John Smith
 
 Hi all,
 
@@ -263,8 +263,8 @@ Start Date: Monday, March 9, 2026
 Manager: Sarah Johnson
 Position: General Manager, Aspen
 Status: RFT
-Company: The Elder Statesman
-Location: TES Aspen retail store
+Company: Nova Style Co.
+Location: NVS Aspen retail store
 ```
 
 **Generated checklist:**
