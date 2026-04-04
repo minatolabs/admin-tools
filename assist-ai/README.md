@@ -286,17 +286,17 @@ Location: TES Aspen retail store
 
 **Input ticket:**
 ```
-Summary: Welcoming Rita Karam in the Paris Office
+Summary: Welcoming Alex Doe in the London Office
 Description:
 Dear All,
-We are welcoming a new employee in the Paris Office.
-Her name is Rita KARAM and her position will be "Retail Coordinator".
+We are welcoming a new employee in the London Office.
+Their name is Alex DOE and their position will be "Retail Coordinator".
 
-Preferred Name: Rita Karam
-Start Date: 2026-03-02
+Preferred Name: Alex Doe
+Start Date: 2026-06-01
 Computer Requirements: Windows
 FileCloud (Shared Drive) Access: yes
-For FileCloud (Shared Drive) access, enter current or former user to mirror access: Helene Thierry
+For FileCloud (Shared Drive) access, enter current or former user to mirror access: Jordan Smith
 Zoom Phone Extension: no
 NewStore System Access?: Yes
 If yes, please select New Store access level: Corporate Office User
@@ -307,7 +307,7 @@ Additional Equipment for Office/WFH: -
 Other system access not listed needed: -
 Distro Lists other than office/retail location: -
 For any other IT Onboarding requests or requirements not listed: -
-Organization: FRAME
+Organization: Acme Corp
 ```
 
 **Generated checklist:**
