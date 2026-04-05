@@ -2,37 +2,37 @@
 # COMPANIES
 # ============================================
 companies:
-  TES:
-    name: "The Elder Statesman"
+  ACR:
+    name: "Acme Retail"
     scope: "domestic"
-  D-FRAME:
-    name: "FRAME"
+  D-ACM:
+    name: "Acme Corp"
     scope: "domestic"
-  I-FRAME:
-    name: "FRAME"
+  I-ACM:
+    name: "Acme Corp"
     scope: "international"
 
 # ============================================
 # EMAIL SUBJECT PATTERNS (for RNH quick-parse)
 # ============================================
 email_patterns:
-  - pattern: "TES\\s*-\\s*RNH"
-    company: "TES"
+  - pattern: "ACR\\s*-\\s*RNH"
+    company: "ACR"
     hire_type: "RNH"
-  - pattern: "TES\\s*-\\s*CNH"
-    company: "TES"
+  - pattern: "ACR\\s*-\\s*CNH"
+    company: "ACR"
     hire_type: "CNH"
   - pattern: "I\\s*-\\s*RNH"
-    company: "I-FRAME"
+    company: "I-ACM"
     hire_type: "RNH"
   - pattern: "D\\s*-\\s*RNH"
-    company: "D-FRAME"
+    company: "D-ACM"
     hire_type: "RNH"
   - pattern: "I\\s*-\\s*CNH"
-    company: "I-FRAME"
+    company: "I-ACM"
     hire_type: "CNH"
   - pattern: "D\\s*-\\s*CNH"
-    company: "D-FRAME"
+    company: "D-ACM"
     hire_type: "CNH"
 
 # ============================================
