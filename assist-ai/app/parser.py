@@ -52,7 +52,7 @@ Return ONLY a valid JSON object with these fields (use null for missing values):
 Rules:
 - hire_type: RNH = Retail New Hire (usually from HR email), CNH = Corporate New Hire (usually from Spiceworks form)
 - scope: if location mentions Paris, London, Tokyo, or any non-US/non-domestic location, set "international"; otherwise "domestic"
-- company_raw: copy exactly what the text says (e.g. "The Elder Statesman", "FRAME", "I-FRAME", "D-FRAME")
+- company_raw: copy exactly what the text says (e.g. "Acme Retail", "Acme Corp", "I-ACM", "D-ACM")
 - role: only for RNH — map position to GM, AGM, Key Holder, or Sales Associate
 - form_fields: only for CNH — extract all field values from the Spiceworks ticket
 - For yes/no fields, normalize to lowercase "yes" or "no"
