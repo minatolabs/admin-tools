@@ -1,6 +1,13 @@
 # ⚙️ AssistAI — IT Onboarding Assistant
 
-AssistAI is a lightweight, self-hosted AI assistant that parses HR onboarding emails and Spiceworks tickets and auto-generates task checklists for IT technicians.
+> _"Because copying field values from an HR email into a ticket tracker, by hand, in 2026, is a war crime."_
+
+AssistAI is a lightweight, self-hosted AI assistant that reads HR onboarding emails and Spiceworks tickets, then spits out a clean task checklist for your IT team. Paste text in. Get a checklist out. No cloud, no subscriptions, no data leaving your building.
+
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=flat-square&logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-latest-009688?style=flat-square&logo=fastapi)
+![Ollama](https://img.shields.io/badge/Ollama-llama3.1%3A8b-black?style=flat-square)
 
 ---
 
@@ -27,7 +34,27 @@ Browser (sessionStorage only)
 ```
 
 **No database. No server-side sessions. Zero persistence.**  
-All checklist state is stored in browser `sessionStorage` — destroyed when the tab is closed.
+All checklist state lives in browser `sessionStorage` — close the tab and it's gone. Intentionally.
+
+---
+
+## 🚨 Before You Deploy — Read This
+
+**This repo ships with placeholder data.** The company names, codes, email patterns, and roles in `config/onboarding_rules.yml` are all examples (`ACR`, `Acme Retail`, etc.). None of it will match your actual environment out of the box.
+
+**You need to customize it.** The good news: it's just a YAML file and takes maybe 20 minutes. The [Configuration](#️-configuration) section below walks you through every part of it.
+
+Here's the short version of what you'll need to swap out:
+
+| What | Where | Example |
+|------|-------|---------|
+| Company names & codes | `config/onboarding_rules.yml` → `companies` | `TES`, `CORP` |
+| Email subject patterns | `config/onboarding_rules.yml` → `email_patterns` | `"TES\\s*-\\s*RNH"` |
+| RNH roles & their tasks | `config/onboarding_rules.yml` → `hire_types.RNH.roles` | `GM`, `Key Holder` |
+| CNH form field names | `config/onboarding_rules.yml` → `hire_types.CNH.form_field_mappings` | Must match your Spiceworks form exactly |
+| LLM hint examples | `app/parser.py` → `SYSTEM_PROMPT` → `company_raw` line | Update to match your actual company names |
+
+> **Tip on CNH form fields:** The field names in the YAML must be **character-for-character identical** to the labels in your Spiceworks ticket form. Copy-paste them — don't retype.
 
 ---
 
@@ -35,7 +62,7 @@ All checklist state is stored in browser `sessionStorage` — destroyed when the
 
 - Docker & Docker Compose v2
 - NVIDIA Container Toolkit (for GPU passthrough)
-- NVIDIA T1000 8GB (or compatible GPU) — the T1000 is the tested configuration
+- NVIDIA T1000 8GB (or compatible GPU) — the T1000 is the tested config
 
 ### Install NVIDIA Container Toolkit (Ubuntu)
 ```bash
@@ -52,21 +79,18 @@ sudo systemctl restart docker
 ## 🚀 Quick Start
 
 ```bash
-# 1. Navigate to the assist-ai directory
-cd assist-ai
+# 1. Customize the config first (seriously, don't skip this)
+#    Edit config/onboarding_rules.yml to match your company
 
-# 2. Start both services (Ollama + AssistAI app)
+# 2. Start both services
 docker compose up -d
 
-# 3. Wait for the Llama 3.1 8B model to download (first run only)
-#    This may take several minutes depending on your connection
+# 3. First run pulls llama3.1:8b (~4.7GB) — grab a coffee
 docker compose logs -f ollama
 
-# 4. Access AssistAI in your browser
+# 4. Open it up
 #    http://your-server-ip:8080
 ```
-
-The app will pull `llama3.1:8b` automatically on first startup via the Ollama container.
 
 ---
 
@@ -76,55 +100,61 @@ The app will pull `llama3.1:8b` automatically on first startup via the Ollama co
 
 1. Copy the full HR onboarding email from your inbox
 2. Paste it into the **Email / Ticket Content** textarea
-3. Leave **Hire Type Override** as "Auto-detect" (or select "RNH" manually)
+3. Leave **Hire Type Override** as "Auto-detect" (or force it to "RNH")
 4. Click **⚡ Parse & Generate Checklist**
 
-The AI will extract:
-- Employee name, start date, position, manager, location
-- Company (ACR, ACM)
-- Role (GM, AGM, Key Holder, Sales Associate) to determine tasks
+The AI extracts: employee name, start date, position, manager, location, company, and role — then maps the role to tasks defined in your YAML config.
 
 ### Corporate New Hire (CNH)
 
 1. Open the Spiceworks ticket for the new hire
-2. Copy the full ticket description (all fields)
-3. Paste it into the textarea
-4. Click **⚡ Parse & Generate Checklist**
+2. Copy the full ticket description
+3. Paste it in, hit parse
 
-The AI will extract all form field values and map them to tasks.
+The LLM reads every form field and maps them to tasks. If Ollama is down, a regex fallback kicks in for basic RNH parsing — CNH really does need the LLM.
 
-### Using the Checklist
+### Checklist Workflow
 
-- **Check off tasks** as you complete them — progress bar updates in real-time
-- **Refresh the page** — your progress is saved (sessionStorage)
-- **Close the tab** — all data is destroyed (intentionally ephemeral)
-- **Clear button** — resets the current session manually
+- **Click a task** to check it off — progress bar updates live
+- **Refresh** — your progress survives (sessionStorage)
+- **Close the tab** — everything is wiped. On purpose.
+- **Clear button** — manual reset mid-session
 
 ---
 
 ## ⚙️ Configuration
 
-All business rules are defined in `config/onboarding_rules.yml`.
+Everything lives in `config/onboarding_rules.yml`. No code changes needed — the rules engine reads it at startup and hot-reloads aren't even necessary since you'll restart Docker anyway.
 
-### Add a new company
+### Companies
 
 ```yaml
 companies:
-  NEW-CO:
-    name: "New Company Name"
+  MYCO:
+    name: "My Company Name"
     scope: "domestic"   # or "international"
+  INTL-MYCO:
+    name: "My Company Name"
+    scope: "international"
 ```
 
-Then add an email pattern:
+Multiple codes can share the same `name` — the scope field is used to pick the right one when both match (e.g. domestic vs international entities of the same brand).
+
+### Email subject patterns
+
+These are regex patterns matched against the email subject line to detect company and hire type:
 
 ```yaml
 email_patterns:
-  - pattern: "NEW\\s*-\\s*RNH"
-    company: "NEW-CO"
+  - pattern: "MYCO\\s*-\\s*RNH"
+    company: "MYCO"
     hire_type: "RNH"
+  - pattern: "MYCO\\s*-\\s*CNH"
+    company: "MYCO"
+    hire_type: "CNH"
 ```
 
-### Add a new RNH role
+### RNH roles
 
 ```yaml
 hire_types:
@@ -138,22 +168,33 @@ hire_types:
             category: "Identity"
 ```
 
-### Add a new CNH form field
+Roles support inheritance — a `GM` can `inherits: "AGM"` to get all AGM tasks plus its own.
+
+### CNH form fields
 
 ```yaml
 hire_types:
   CNH:
     form_field_mappings:
-      my_new_field:
-        field_name: "My New System Access"
+      my_system_access:
+        field_name: "My System Access"   # must match your Spiceworks label exactly
         type: "yes_no"
         task_on_yes:
-          name: "Set Up My New System"
+          name: "Set Up My System"
           priority: 2
           category: "Business Systems"
 ```
 
-No code changes needed — the rules engine reads the YAML at startup.
+Field types: `yes_no`, `select` (dropdown), `text` (freeform with skip values).
+
+### Also update the LLM prompt
+
+In `app/parser.py`, find the `company_raw` line in `SYSTEM_PROMPT` and update the examples to match your real company names — it helps the LLM normalize them correctly:
+
+```python
+"company_raw": "<company name as written in the text or null>",
+# e.g. "My Company", "My Co International", "MC"
+```
 
 ---
 
@@ -162,39 +203,38 @@ No code changes needed — the rules engine reads the YAML at startup.
 ### Ollama not starting / GPU not detected
 
 ```bash
-# Check NVIDIA is visible to Docker
+# Is NVIDIA visible to Docker at all?
 docker run --rm --gpus all nvidia/cuda:12.0-base nvidia-smi
 
-# Check Ollama logs
+# Ollama logs
 docker compose logs ollama
 
-# Verify NVIDIA Container Toolkit is installed
+# Toolkit version check
 nvidia-ctk --version
 ```
 
-### Model download taking too long
+### Model taking forever to download
 
-The `llama3.1:8b` model is ~4.7GB. Monitor with:
+`llama3.1:8b` is ~4.7GB. It's a one-time pull. Watch it:
 
 ```bash
 docker compose logs -f ollama
 ```
 
-### App shows "Ollama Unavailable (fallback mode)"
+### "Ollama Unavailable (fallback mode)" in the UI
 
-The app will still work using the regex-based fallback parser. The fallback can extract basic data from RNH emails using email subject patterns. For CNH tickets, LLM parsing is recommended.
+The app still works — it falls back to regex parsing for basic RNH email detection. CNH parsing without the LLM will be incomplete. Fix Ollama, then it auto-recovers:
 
-To check Ollama health directly:
 ```bash
-curl http://localhost:11434/api/tags
+curl http://localhost:11434/api/tags   # should return model list
 ```
 
 ### Port conflicts
 
-Edit `docker-compose.yml` to change ports:
 ```yaml
+# docker-compose.yml
 ports:
-  - "9090:8080"   # Change 9090 to any available port
+  - "9090:8080"   # swap 9090 for whatever's free
 ```
 
 ---
@@ -206,10 +246,6 @@ ports:
 **Input email:**
 ```
 Sub : ACR - RNH Alex Johnson
-
-Hi all,
-
-We have a new hire today:
 
 Employee: Alex Johnson
 Start Date: Monday, March 9, 2026
@@ -240,10 +276,6 @@ Location: Acme Retail Midtown store
 **Input ticket:**
 ```
 Summary: Welcoming Jamie Chen in the London Office
-Description:
-Dear All,
-We are welcoming a new employee in the London Office.
-Their name is Jamie CHEN and their position will be "Retail Coordinator".
 
 Preferred Name: Jamie Chen
 Start Date: 2026-03-02
@@ -256,10 +288,6 @@ If yes, please select New Store access level: Corporate Office User
 Full Circle Account: No
 BlueCherry ERP: no
 BlueCherry PLM: no
-Additional Equipment for Office/WFH: -
-Other system access not listed needed: -
-Distro Lists other than office/retail location: -
-For any other IT Onboarding requests or requirements not listed: -
 Organization: Acme Corp
 ```
 
@@ -286,19 +314,19 @@ Organization: Acme Corp
 | `docker-compose.yml` | Orchestrates Ollama (GPU) + AssistAI app |
 | `Dockerfile` | Python 3.14-slim container for the app |
 | `requirements.txt` | FastAPI, uvicorn, httpx, pyyaml |
-| `config/onboarding_rules.yml` | All business rules, companies, roles, form fields |
-| `app/main.py` | FastAPI entry point, API routes, static serving |
+| `config/onboarding_rules.yml` | **Start here** — all business rules, companies, roles, form fields |
+| `app/main.py` | FastAPI entry point, API routes, static file serving |
 | `app/parser.py` | Ollama LLM integration + regex fallback |
-| `app/rules.py` | Rules engine — generates checklists from parsed data |
-| `web/index.html` | Single page application |
+| `app/rules.py` | Rules engine — turns parsed data into task lists |
+| `web/index.html` | Single page app |
 | `web/app.js` | Frontend logic, sessionStorage, progress tracking |
-| `web/style.css` | Dark professional theme |
+| `web/style.css` | Dark theme |
 
 ---
 
 ## ⚠️ Privacy & Security
 
-- **Zero server-side persistence** — the API processes and discards data immediately
-- **No logging of employee data** — keep it that way
-- **sessionStorage only** — data never leaves the browser tab
-- **Internal network only** — do not expose port 8080 to the internet
+- **Zero server-side persistence** — the API processes and discards immediately
+- **No logging of employee data** — and please keep it that way
+- **sessionStorage only** — checklist state never leaves the tab
+- **Internal network only** — do not expose port 8080 to the internet. Seriously.
