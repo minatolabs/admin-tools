@@ -81,7 +81,7 @@ The app will pull `llama3.1:8b` automatically on first startup via the Ollama co
 
 The AI will extract:
 - Employee name, start date, position, manager, location
-- Company (TES, FRAME)
+- Company (ACR, ACM)
 - Role (GM, AGM, Key Holder, Sales Associate) to determine tasks
 
 ### Corporate New Hire (CNH)
@@ -205,19 +205,19 @@ ports:
 
 **Input email:**
 ```
-Sub : TES - RNH John Smith
+Sub : ACR - RNH Alex Johnson
 
 Hi all,
 
 We have a new hire today:
 
-Employee: John Smith
+Employee: Alex Johnson
 Start Date: Monday, March 9, 2026
-Manager: Sarah Johnson
-Position: General Manager, Aspen
+Manager: Jordan Lee
+Position: General Manager, Midtown
 Status: RFT
-Company: The Elder Statesman
-Location: TES Aspen retail store
+Company: Acme Retail
+Location: Acme Retail Midtown store
 ```
 
 **Generated checklist:**
@@ -239,17 +239,17 @@ Location: TES Aspen retail store
 
 **Input ticket:**
 ```
-Summary: Welcoming Rita Karam in the Paris Office
+Summary: Welcoming Jamie Chen in the London Office
 Description:
 Dear All,
-We are welcoming a new employee in the Paris Office.
-Her name is Rita KARAM and her position will be "Retail Coordinator".
+We are welcoming a new employee in the London Office.
+Their name is Jamie CHEN and their position will be "Retail Coordinator".
 
-Preferred Name: Rita Karam
+Preferred Name: Jamie Chen
 Start Date: 2026-03-02
 Computer Requirements: Windows
 FileCloud (Shared Drive) Access: yes
-For FileCloud (Shared Drive) access, enter current or former user to mirror access: Helene Thierry
+For FileCloud (Shared Drive) access, enter current or former user to mirror access: Sophie Martin
 Zoom Phone Extension: no
 NewStore System Access?: Yes
 If yes, please select New Store access level: Corporate Office User
@@ -260,7 +260,7 @@ Additional Equipment for Office/WFH: -
 Other system access not listed needed: -
 Distro Lists other than office/retail location: -
 For any other IT Onboarding requests or requirements not listed: -
-Organization: FRAME
+Organization: Acme Corp
 ```
 
 **Generated checklist:**
